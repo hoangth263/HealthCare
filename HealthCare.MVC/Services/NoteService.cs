@@ -53,6 +53,7 @@ namespace HealthCare.MVC.Services
 
         public void Update(Note note)
         {
+            note.UpdatedDate = DateTime.Now;
             _noteRepository.Update(note);
         }
 

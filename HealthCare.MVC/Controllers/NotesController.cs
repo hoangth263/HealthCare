@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using HealthCare.MVC.Entities;
+using HealthCare.MVC.Models;
+using HealthCare.MVC.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthCare.MVC.Data;
-using HealthCare.MVC.Entities;
-using AutoMapper;
-using HealthCare.MVC.Services.IServices;
 
 namespace HealthCare.MVC.Controllers
 {
@@ -28,6 +24,8 @@ namespace HealthCare.MVC.Controllers
         // GET: Notes
         public async Task<IActionResult> Index(int asignId)
         {
+
+            TempData["AsignId"] = asignId;
             var healthCareContext = _noteService.Get(x => x.AsignId == asignId).Include(n => n.Asign);
             return View(await healthCareContext.ToListAsync());
         }
@@ -63,32 +61,32 @@ namespace HealthCare.MVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AsignId,Title,Content,Type")] Note note)
+        public async Task<IActionResult> Create([Bind("AsignId,Title,Content,Type")] NoteCreateModel note)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(note);
-                await _context.SaveChangesAsync();
+                await _noteService.AddAsync(_mapper.Map<Note>(note));
+                await _noteService.SaveChangeAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AsignId"] = new SelectList(_context.Asigns, "Id", "Id", note.AsignId);
+            ViewData["AsignId"] = new SelectList(_asignService.GetAll(), "Id", "Id", note.AsignId);
             return View(note);
         }
 
         // GET: Notes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id, int asignId)
         {
-            if (id == null || _context.Notes == null)
+            if (id == null || _noteService == null)
             {
                 return NotFound();
             }
 
-            var note = await _context.Notes.FindAsync(id);
+            var note = await _noteService.FindAsync(id);
             if (note == null)
             {
                 return NotFound();
             }
-            ViewData["AsignId"] = new SelectList(_context.Asigns, "Id", "Id", note.AsignId);
+            ViewData["AsignId"] = asignId;
             return View(note);
         }
 
@@ -97,7 +95,7 @@ namespace HealthCare.MVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AsignId,Title,Content,Type,CreatedDate,UpdatedDate")] Note note)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AsignId,Title,Content,Type")] NoteUpdateModel note)
         {
             if (id != note.Id)
             {
@@ -108,8 +106,8 @@ namespace HealthCare.MVC.Controllers
             {
                 try
                 {
-                    _context.Update(note);
-                    await _context.SaveChangesAsync();
+                    _noteService.Update(_mapper.Map<Note>(note));
+                    await _noteService.SaveChangeAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -124,19 +122,19 @@ namespace HealthCare.MVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AsignId"] = new SelectList(_context.Asigns, "Id", "Id", note.AsignId);
+            ViewData["AsignId"] = note.AsignId;
             return View(note);
         }
 
         // GET: Notes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Notes == null)
+            if (id == null || _noteService == null)
             {
                 return NotFound();
             }
 
-            var note = await _context.Notes
+            var note = await _noteService.GetAll()
                 .Include(n => n.Asign)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (note == null)
@@ -152,23 +150,18 @@ namespace HealthCare.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Notes == null)
+            if (_noteService == null)
             {
                 return Problem("Entity set 'HealthCareContext.Notes'  is null.");
             }
-            var note = await _context.Notes.FindAsync(id);
-            if (note != null)
-            {
-                _context.Notes.Remove(note);
-            }
-            
-            await _context.SaveChangesAsync();
+            await _noteService.Remove(id);
+            await _noteService.SaveChangeAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool NoteExists(int id)
         {
-          return (_context.Notes?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_noteService.GetAll()?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

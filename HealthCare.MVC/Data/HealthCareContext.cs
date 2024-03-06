@@ -19,14 +19,6 @@ namespace HealthCare.MVC.Data
         public virtual DbSet<Customer> Customers { get; set; } = null!;
         public virtual DbSet<Note> Notes { get; set; } = null!;
 
-        //        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //        {
-        //            if (!optionsBuilder.IsConfigured)
-        //            {
-        //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        //                optionsBuilder.UseSqlServer("server =(local); database = HealthCare;uid=sa;pwd=12345;TrustServerCertificate=True");
-        //            }
-        //        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +29,10 @@ namespace HealthCare.MVC.Data
                 entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.Address).HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Email).HasMaxLength(50);
 
@@ -50,6 +46,14 @@ namespace HealthCare.MVC.Data
                     .HasMaxLength(13)
                     .IsUnicode(false)
                     .IsFixedLength();
+
+                entity.Property(e => e.Role)
+                    .HasMaxLength(5)
+                    .HasDefaultValueSql("('User')");
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
             });
 
             modelBuilder.Entity<Asign>(entity =>
@@ -60,19 +64,27 @@ namespace HealthCare.MVC.Data
 
                 entity.Property(e => e.AgentId).HasColumnName("AgentID");
 
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.Agent)
                     .WithMany(p => p.Asigns)
                     .HasForeignKey(d => d.AgentId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Asign__AgentID__286302EC");
+                    .HasConstraintName("FK__Asign__AgentID__31EC6D26");
 
                 entity.HasOne(d => d.Customer)
                     .WithMany(p => p.Asigns)
                     .HasForeignKey(d => d.CustomerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Asign__CustomerI__29572725");
+                    .HasConstraintName("FK__Asign__CustomerI__32E0915F");
             });
 
             modelBuilder.Entity<Customer>(entity =>
@@ -82,6 +94,10 @@ namespace HealthCare.MVC.Data
                 entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.Address).HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Email).HasMaxLength(50);
 
@@ -93,6 +109,10 @@ namespace HealthCare.MVC.Data
                     .HasMaxLength(13)
                     .IsUnicode(false)
                     .IsFixedLength();
+
+                entity.Property(e => e.UpdatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
             });
 
             modelBuilder.Entity<Note>(entity =>
@@ -101,13 +121,15 @@ namespace HealthCare.MVC.Data
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.AsignId).HasColumnName("AsignID");
+                entity.Property(e => e.AgentId).HasColumnName("AgentID");
 
                 entity.Property(e => e.Content).HasColumnType("text");
 
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
 
                 entity.Property(e => e.Title).HasMaxLength(200);
 
@@ -120,11 +142,11 @@ namespace HealthCare.MVC.Data
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.HasOne(d => d.Asign)
+                entity.HasOne(d => d.Customer)
                     .WithMany(p => p.Notes)
-                    .HasForeignKey(d => d.AsignId)
+                    .HasForeignKey(d => d.CustomerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Note__AsignID__2E1BDC42");
+                    .HasConstraintName("FK__Note__CustomerID__37A5467C");
             });
 
             OnModelCreatingPartial(modelBuilder);

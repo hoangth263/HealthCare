@@ -2,7 +2,6 @@
 using HealthCare.MVC.Entities;
 using HealthCare.MVC.Models;
 using HealthCare.MVC.Services.IServices;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +10,7 @@ using System.Security.Claims;
 namespace HealthCare.MVC.Controllers
 {
 
-    [Authorize]
+    //[Authorize]
     public class AsignsController : Controller
     {
         private readonly IAsignService _asignService;
@@ -39,7 +38,7 @@ namespace HealthCare.MVC.Controllers
                     .ToList().OrderBy(u => u.Agent.Email == ((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.Sid).Value ? 0 : 1)
                                .ThenBy(u => u.Agent.Email));
             }
-            return View(healthCareContext.ToList().OrderBy(u => u.Agent.Email == ((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.Sid).Value ? 0 : 1) 
+            return View(healthCareContext.ToList().OrderBy(u => u.Agent.Email == ((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.Sid).Value ? 0 : 1)
                                .ThenBy(u => u.Agent.Email));
         }
 
@@ -64,9 +63,9 @@ namespace HealthCare.MVC.Controllers
         }
 
         // GET: Asigns/Create
-        public IActionResult Create()
+        public IActionResult Create(int id)
         {
-            ViewData["AgentId"] = new SelectList(_agentService.GetAll(), "Id", "Email");
+            TempData["AgentId"] = id;
             ViewData["CustomerId"] = new SelectList(_customerService.GetAll(), "Id", "Email");
             return View();
         }
@@ -89,7 +88,7 @@ namespace HealthCare.MVC.Controllers
                 {
                     await _asignService.AddAsync(_mapper.Map<Asign>(asign));
                     await _asignService.SaveChangeAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Details", "Agents", new { id = asign.AgentId });
                 }
             }
             ViewData["AgentId"] = new SelectList(_agentService.GetAll(), "Id", "Email", asign.AgentId);
@@ -110,9 +109,9 @@ namespace HealthCare.MVC.Controllers
             {
                 return NotFound();
             }
-            ViewData["AgentId"] = new SelectList(_agentService.GetAll(), "Id", "Email", asign.AgentId);
+            TempData["AgentId"] = asign.AgentId;
             ViewData["CustomerId"] = new SelectList(_customerService.GetAll(), "Id", "Email", asign.CustomerId);
-            return View(asign);
+            return View(_mapper.Map<AsignUpdateModel>(asign));
         }
 
         // POST: Asigns/Edit/5
@@ -120,9 +119,9 @@ namespace HealthCare.MVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AgentId,CustomerId")] AsignUpdateModel asign)
+        public async Task<IActionResult> Edit(int id, [Bind("AgentId,CustomerId")] AsignUpdateModel asign)
         {
-            if (id != asign.Id)
+            if (id == 0 || id == null)
             {
                 return NotFound();
             }
@@ -131,16 +130,24 @@ namespace HealthCare.MVC.Controllers
             {
                 try
                 {
-                    if (_asignService.Get(x => x.AgentId == asign.AgentId && x.CustomerId == asign.CustomerId && asign.Id == x.Id).Any())
+                    var checkList = _asignService.Get(x => x.AgentId == asign.AgentId && x.CustomerId == asign.CustomerId);
+                    if (checkList.Any())
                     {
-                        ModelState.AddModelError("AgentId", "This customer is already assigned to this agent.");
-                        ModelState.AddModelError("CustomerId", "This customer is already assigned to this agent.");
+                        if (!checkList.Where(x => x.Id == id).Any())
+                        {
+                            ModelState.AddModelError("AgentId", "This customer is already assigned to this agent.");
+                            ModelState.AddModelError("CustomerId", "This customer is already assigned to this agent.");
+                        }
                     }
-                    else
+                    if (ModelState.ErrorCount == 0)
                     {
-                        _asignService.Update(_mapper.Map<Asign>(asign));
+                        var asignUpdate = await _asignService.FindAsync(id);
+                        asignUpdate.AgentId = asign.AgentId;
+                        asignUpdate.CustomerId = asign.CustomerId;
+                        asignUpdate.UpdatedDate = DateTime.Now;
+                        _asignService.Update(asignUpdate);
                         await _asignService.SaveChangeAsync();
-                        return RedirectToAction(nameof(Index));
+                        return RedirectToAction("Details", "Agents", new { id = asign.AgentId });
                     }
                 }
                 catch (DbUpdateConcurrencyException)
@@ -154,9 +161,8 @@ namespace HealthCare.MVC.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["AgentId"] = new SelectList(_agentService.GetAll(), "Id", "Email", asign.AgentId);
+            TempData["AgentId"] = asign.AgentId;
             ViewData["CustomerId"] = new SelectList(_customerService.GetAll(), "Id", "Email", asign.CustomerId);
             return View(asign);
         }
@@ -190,10 +196,13 @@ namespace HealthCare.MVC.Controllers
             {
                 return Problem("Entity set 'HealthCareContext.Asigns'  is null.");
             }
-            await _asignService.Remove(id);
+            var asign = await _asignService.FindAsync(id);
+            asign.IsDeleted = true;
+            asign.UpdatedDate = DateTime.Now;
+            _asignService.Update(asign);
 
             await _asignService.SaveChangeAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Agents", new { id = asign.AgentId });
         }
 
         private bool AsignExists(int id)

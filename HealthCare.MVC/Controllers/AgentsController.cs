@@ -2,14 +2,14 @@
 using HealthCare.MVC.Entities;
 using HealthCare.MVC.Models;
 using HealthCare.MVC.Services.IServices;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
 namespace HealthCare.MVC.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class AgentsController : Controller
     {
         private readonly IAgentService _agentService;
@@ -29,11 +29,14 @@ namespace HealthCare.MVC.Controllers
             {
                 TempData["SearchString"] = SearchString;
                 return _agentService != null ?
-                          View(_mapper.Map<List<AgentViewModel>>(_agentService.Get(x => x.FirstName.ToLower().Contains(SearchString.ToLower()) || x.LastName.ToLower().Contains(SearchString.ToLower())).ToList())) :
+                          View(_mapper.Map<List<AgentViewModel>>(_agentService.Get(x => x.FirstName.ToLower().Contains(SearchString.ToLower())
+                          || x.LastName.ToLower().Contains(SearchString.ToLower()))
+                          .Where(x => x.IsDeleted == false).ToList())) :
+
                           Problem("Entity set 'HealthCareContext.Agents'  is null.");
             }
             return _agentService != null ?
-                          View(_mapper.Map<List<AgentViewModel>>(_agentService.GetAll()).ToList()) :
+                          View(_mapper.Map<List<AgentViewModel>>(_agentService.Get(x => x.IsDeleted == false)).ToList()) :
                           Problem("Entity set 'HealthCareContext.Agents'  is null.");
         }
 
@@ -45,7 +48,7 @@ namespace HealthCare.MVC.Controllers
                 return NotFound();
             }
 
-            var agent = _mapper.Map<AgentViewModel>(await _agentService.FindAsync(id));
+            var agent = _mapper.Map<AgentDetailsModel>(_agentService.Get(x => x.Id == id).Include(x => x.Asigns).ThenInclude(a => a.Customer).FirstOrDefault());
             if (agent == null)
             {
                 return NotFound();
@@ -57,6 +60,7 @@ namespace HealthCare.MVC.Controllers
         // GET: Agents/Create
         public IActionResult Create()
         {
+            ViewData["Role"] = new SelectList(new List<string> { "User", "Admin" });
             return View();
         }
 
@@ -65,7 +69,7 @@ namespace HealthCare.MVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Email,FirstName,LastName,PhoneNumber,Address,Password")] AgentCreateModel agent)
+        public async Task<IActionResult> Create([Bind("Email,FirstName,LastName,PhoneNumber,Address,Password,Role")] AgentCreateModel agent)
         {
             if (ModelState.IsValid)
             {
@@ -89,14 +93,18 @@ namespace HealthCare.MVC.Controllers
                 {
                     ModelState.AddModelError("Email", "Invalid email format.");
                 }
-                if (ModelState.ErrorCount > 0)
+                if (agent.Role == null && agent.Role == "")
                 {
-                    return View(agent);
+                    agent.Role = "User";
                 }
-                await _agentService.AddAsync(_mapper.Map<Agent>(agent));
-                await _agentService.SaveChangeAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.ErrorCount == 0)
+                {
+                    await _agentService.AddAsync(_mapper.Map<Agent>(agent));
+                    await _agentService.SaveChangeAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
+            ViewData["Role"] = new SelectList(new List<string> { "User", "Admin" });
             return View(agent);
         }
 
@@ -114,7 +122,8 @@ namespace HealthCare.MVC.Controllers
             {
                 return NotFound();
             }
-            return View(agent);
+            ViewData["Role"] = new SelectList(new List<string> { "User", "Admin" }, agent.Role);
+            return View(_mapper.Map<AgentUpdateModel>(agent));
         }
 
         // POST: Agents/Edit/5
@@ -122,7 +131,7 @@ namespace HealthCare.MVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,PhoneNumber,Address,Password")] Agent agent)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,PhoneNumber,Address,Password,Role")] AgentUpdateModel agent)
         {
             if (id != agent.Id)
             {
@@ -159,13 +168,27 @@ namespace HealthCare.MVC.Controllers
                     {
                         ModelState.AddModelError("Email", "Invalid email format.");
                     }
-                    if (ModelState.ErrorCount > 0)
+                    if (agent.Role == null && agent.Role == "")
                     {
-                        return View(agent);
+                        agent.Role = "User";
                     }
+                    if (ModelState.ErrorCount == 0)
+                    {
+                        var agentUpdate = _agentService.Get(x => x.Id == agent.Id).FirstOrDefault();
 
-                    _agentService.Update(_mapper.Map<Agent>(agent));
-                    await _agentService.SaveChangeAsync();
+                        agentUpdate.Email = agent.Email;
+                        agentUpdate.FirstName = agent.FirstName;
+                        agentUpdate.LastName = agent.LastName;
+                        agentUpdate.PhoneNumber = agent.PhoneNumber;
+                        agentUpdate.Address = agent.Address;
+                        agentUpdate.Password = agent.Password;
+                        agentUpdate.Role = agent.Role;
+                        agentUpdate.UpdatedDate = DateTime.Now;
+
+                        _agentService.Update(agentUpdate);
+                        await _agentService.SaveChangeAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -178,8 +201,8 @@ namespace HealthCare.MVC.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
+            ViewData["Role"] = new SelectList(new List<string> { "User", "Admin" }, agent.Role);
             return View(agent);
         }
 
@@ -210,7 +233,10 @@ namespace HealthCare.MVC.Controllers
             {
                 return Problem("Entity set 'HealthCareContext.Agents'  is null.");
             }
-            await _agentService.Remove(id);
+            var agent = await _agentService.FindAsync(id);
+            agent.IsDeleted = true;
+            agent.UpdatedDate = DateTime.Now;
+            _agentService.Update(agent);
 
             await _agentService.SaveChangeAsync();
             return RedirectToAction(nameof(Index));

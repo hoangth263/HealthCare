@@ -9,6 +9,8 @@ namespace HealthCare.MVC.Mappers
         public CustomerMapper()
         {
             CreateMap<Customer, CustomerCreateModel>().ReverseMap();
+            CreateMap<Customer, CustomerUpdateModel>().ReverseMap();
+            CreateMap<Customer, CustomerViewModel>().ReverseMap();
         }
     }
 }

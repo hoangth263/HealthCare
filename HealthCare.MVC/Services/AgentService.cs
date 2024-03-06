@@ -32,6 +32,8 @@ namespace HealthCare.MVC.Services
         public async Task AddAsync(Agent agent)
         {
             agent.Password = EncryptPassword(agent.Password);
+            agent.CreatedDate = DateTime.Now;
+            agent.UpdatedDate = DateTime.Now;
             await _agentRepository.AddAsync(agent);
         }
 

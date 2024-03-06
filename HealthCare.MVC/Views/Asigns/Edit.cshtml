@@ -1,5 +1,4 @@
-﻿@model HealthCare.MVC.Entities.Asign
-
+﻿@model HealthCare.MVC.Models.AsignUpdateModel
 @{
     ViewData["Title"] = "Edit";
 }
@@ -13,11 +12,7 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="AgentId" class="control-label"></label>
-                <select asp-for="AgentId" class="form-control" asp-items="ViewBag.AgentId"></select>
-                <span asp-validation-for="AgentId" class="text-danger"></span>
-            </div>
+            <input asp-for="AgentId" class="form-control" type="hidden" asp-items="@TempData["AgentId"]" />
             <div class="form-group">
                 <label asp-for="CustomerId" class="control-label"></label>
                 <select asp-for="CustomerId" class="form-control" asp-items="ViewBag.CustomerId"></select>
@@ -35,5 +30,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

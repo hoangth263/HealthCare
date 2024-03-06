@@ -9,7 +9,9 @@ namespace HealthCare.MVC.Mappers
         public AgentMapper()
         {
             CreateMap<Agent, AgentCreateModel>().ReverseMap();
+            CreateMap<Agent, AgentDetailsModel>().ReverseMap();
             CreateMap<Agent, AgentViewModel>().ReverseMap();
+            CreateMap<Agent, AgentUpdateModel>().ReverseMap();
         }
     }
 }

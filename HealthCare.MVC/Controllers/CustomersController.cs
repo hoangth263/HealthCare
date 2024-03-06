@@ -13,11 +13,17 @@ namespace HealthCare.MVC.Controllers
     public class CustomersController : Controller
     {
         private readonly ICustomerService _customerService;
+        private readonly INoteService _noteService;
+        private readonly IAgentService _agentService;
+        private readonly IAsignService _asignService;
         private readonly IMapper _mapper;
 
-        public CustomersController(ICustomerService customerService, IMapper mapper)
+        public CustomersController(ICustomerService customerService, INoteService noteService, IAgentService agentService, IAsignService asignService, IMapper mapper)
         {
             _customerService = customerService;
+            _noteService = noteService;
+            _agentService = agentService;
+            _asignService = asignService;
             _mapper = mapper;
         }
 
@@ -45,13 +51,30 @@ namespace HealthCare.MVC.Controllers
                 return NotFound();
             }
 
-            var customer = await _customerService.FindAsync(id);
-            if (customer == null)
+            var customerVM = _mapper.Map<CustomerViewModel>(await _customerService.FindAsync(id));
+
+            var asignList = _asignService.Get(x => x.CustomerId == id).Include(x => x.Agent).ToList();
+            customerVM.Agents = new List<string>();
+            foreach (var asign in asignList)
+            {
+                customerVM.Agents.Add(asign.Agent.FirstName + " " + asign.Agent.LastName);
+            }
+
+
+            var notesVM = _mapper.Map<List<NoteViewModel>>(_noteService.Get(x => x.CustomerId == id).OrderBy(x => x.UpdatedDate).ToList());
+
+            foreach (var note in notesVM)
+            {
+                note.Agent = await _agentService.FindAsync(note.AgentId);
+            }
+            customerVM.Notes = notesVM;
+
+            if (customerVM == null)
             {
                 return NotFound();
             }
 
-            return View(customer);
+            return View(customerVM);
         }
 
         // GET: Customers/Create

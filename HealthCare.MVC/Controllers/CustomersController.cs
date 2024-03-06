@@ -2,12 +2,14 @@
 using HealthCare.MVC.Entities;
 using HealthCare.MVC.Models;
 using HealthCare.MVC.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
 namespace HealthCare.MVC.Controllers
 {
+    [Authorize]
     public class CustomersController : Controller
     {
         private readonly ICustomerService _customerService;

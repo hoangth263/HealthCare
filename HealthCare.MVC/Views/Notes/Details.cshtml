@@ -40,15 +40,21 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.UpdatedDate)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Asign)
+        <dt class="col-sm-2">
+            Asign Agent
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Asign.Id)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Asign.Agent.Email)
+        </dd>
+        <dt class="col-sm-2">
+            Customer
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Asign.Customer.Email)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.Id" asp-route-asignId="@TempData["asignId"]">Edit</a> |
+    <a asp-action="Index" asp-route-asignId="@TempData["asignId"]">Back to List</a>
 </div>

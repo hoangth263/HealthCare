@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace HealthCare.MVC.Entities
+﻿namespace HealthCare.MVC.Entities
 {
-    public partial class Agent
+    public partial class Customer
     {
-        public Agent()
+        public Customer()
         {
             Asigns = new HashSet<Asign>();
         }
@@ -16,7 +13,6 @@ namespace HealthCare.MVC.Entities
         public string LastName { get; set; } = null!;
         public string PhoneNumber { get; set; } = null!;
         public string Address { get; set; } = null!;
-        public string Password { get; set; } = null!;
 
         public virtual ICollection<Asign> Asigns { get; set; }
     }

@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using HealthCare.MVC.Entities;
+using HealthCare.MVC.Models;
+using HealthCare.MVC.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthCare.MVC.Data;
-using HealthCare.MVC.Entities;
-using AutoMapper;
-using HealthCare.MVC.Services.IServices;
-using HealthCare.MVC.Services;
-using HealthCare.MVC.Models;
 
 namespace HealthCare.MVC.Controllers
 {
+
+    [Authorize]
     public class AsignsController : Controller
     {
         private readonly IAsignService _asignService;
@@ -93,7 +90,7 @@ namespace HealthCare.MVC.Controllers
         // GET: Asigns/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            if (id == null || _asignService == null || id ==0)
+            if (id == null || _asignService == null || id == 0)
             {
                 return NotFound();
             }
@@ -191,7 +188,7 @@ namespace HealthCare.MVC.Controllers
 
         private bool AsignExists(int id)
         {
-          return (_asignService.GetAll()?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_asignService.GetAll()?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

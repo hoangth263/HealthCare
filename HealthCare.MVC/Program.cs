@@ -7,6 +7,19 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = "MyCookieAuth";
+    options.DefaultSignInScheme = "MyCookieAuth";
+    options.DefaultChallengeScheme = "MyCookieAuth";
+}).AddCookie("MyCookieAuth", options =>
+{
+    options.Cookie.Name = "MyCookieAuth";
+    options.LoginPath = "/Login";
+    options.LogoutPath = "/Login";
+    options.AccessDeniedPath = "/Home/Index";
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -22,6 +35,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

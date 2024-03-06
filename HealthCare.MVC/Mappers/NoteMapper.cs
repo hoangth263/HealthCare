@@ -9,6 +9,7 @@ namespace HealthCare.MVC.Mappers
         public NoteMapper()
         {
             CreateMap<Note, NoteCreateModel>().ReverseMap();
+            CreateMap<Note, NoteUpdateModel>().ReverseMap();
         }
     }
 }

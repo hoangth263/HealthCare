@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace HealthCare.MVC.Entities
+﻿namespace HealthCare.MVC.Entities
 {
     public partial class Asign
     {

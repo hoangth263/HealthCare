@@ -15,6 +15,20 @@ namespace HealthCare.MVC.Services
             _unitOfWork = unitOfWork;
             _agentRepository = agentRepository;
         }
+
+        public async Task<Agent?> Login(string Email, string Password)
+        {
+            var agent = _agentRepository.Get(x => x.Email == Email).FirstOrDefault();
+            if (agent != null)
+            {
+                if (PasswordManager.VerifyPassword(Password, agent.Password))
+                {
+                    return agent;
+                }
+            }
+            return null;
+        }
+
         public async Task AddAsync(Agent agent)
         {
             agent.Password = EncryptPassword(agent.Password);

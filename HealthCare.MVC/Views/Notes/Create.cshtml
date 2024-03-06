@@ -1,4 +1,4 @@
-﻿@model HealthCare.MVC.Entities.Note
+﻿@model HealthCare.MVC.Models.NoteCreateModel
 
 @{
     ViewData["Title"] = "Create";
@@ -14,7 +14,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="AsignId" class="control-label"></label>
-                <select asp-for="AsignId" class ="form-control" asp-items="ViewBag.AsignId"></select>
+                <input asp-for="AsignId" class="form-control" value="@TempData["AsignId"]" readonly />
             </div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
@@ -28,7 +28,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Type" class="control-label"></label>
-                <input asp-for="Type" class="form-control" />
+                <select asp-for="Type" class="form-control" asp-items="ViewBag.Type"></select>
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -39,7 +39,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" asp-route-asignId="@TempData["AsignId"]">Back to List</a>
 </div>
 
 @section Scripts {

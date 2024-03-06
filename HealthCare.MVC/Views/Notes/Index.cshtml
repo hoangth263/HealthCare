@@ -10,15 +10,18 @@
     <div class="form-actions no-color">
         <p>
             Find by name:
-            <input type="text" name="SearchString" placeholder="Search..." />
-            <input type="submit" class="btn btn-primary" />
+            <input type="number" name="asignId" value="@TempData["AsignId"]" hidden />
+            <input type="text" name="SearchString" value="@TempData["SearchString"]" placeholder="Search..." />
+            <input type="submit" class="btn btn-primary" value="Search" />
         </p>
     </div>
 </form>
-
-<p>
-    <a asp-action="Create" asp-route-asignId="@TempData["AsignId"]">Create New</a>
-</p>
+@if (TempData["AsignId"] != null)
+{
+    <p>
+        <a asp-action="Create" asp-route-asignId="@TempData["AsignId"]">Create New</a>
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -36,9 +39,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.UpdatedDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Asign)
             </th>
             <th></th>
         </tr>
@@ -62,14 +62,15 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.UpdatedDate)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Asign.Id)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                @if (TempData["AsignId"] != null)
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+
+                }
             </tr>
         }
     </tbody>

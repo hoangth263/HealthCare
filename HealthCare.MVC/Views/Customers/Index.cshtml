@@ -1,17 +1,17 @@
 ﻿@model IEnumerable<HealthCare.MVC.Entities.Customer>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Customer List";
 }
 
-<h1>Index</h1>
+<h1>Customer List</h1>
 
 <form asp-action="Index" method="get">
     <div class="form-actions no-color">
         <p>
             Find by name:
-            <input type="text" name="SearchString" placeholder="Search..." />
-            <input type="submit" class="btn btn-primary" />
+            <input type="text" name="SearchString" valplaceholder="Search..." value="@TempData["SearchString"]" />
+            <input type="submit" class="btn btn-primary" value="Search" />
         </p>
     </div>
 </form>

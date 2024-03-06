@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace HealthCare.MVC.Controllers
 {
@@ -27,10 +28,19 @@ namespace HealthCare.MVC.Controllers
         }
 
         // GET: Asigns
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string SearchString)
         {
             var healthCareContext = _asignService.GetAll().Include(a => a.Agent).Include(a => a.Customer);
-            return View(await healthCareContext.ToListAsync());
+            if (SearchString != null)
+            {
+                TempData["SearchString"] = SearchString;
+                return View(healthCareContext.Where(x => x.Agent.Email.ToLower().Contains(SearchString.ToLower())
+                || x.Customer.Email.ToLower().Contains(SearchString.ToLower()))
+                    .ToList().OrderBy(u => u.Agent.Email == ((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.Sid).Value ? 0 : 1)
+                               .ThenBy(u => u.Agent.Email));
+            }
+            return View(healthCareContext.ToList().OrderBy(u => u.Agent.Email == ((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.Sid).Value ? 0 : 1) 
+                               .ThenBy(u => u.Agent.Email));
         }
 
         // GET: Asigns/Details/5

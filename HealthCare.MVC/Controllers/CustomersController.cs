@@ -27,6 +27,7 @@ namespace HealthCare.MVC.Controllers
 
             if (SearchString != null)
             {
+                TempData["SearchString"] = SearchString;
                 return _customerService != null ?
                           View(_customerService.Get(x => x.FirstName.ToLower().Contains(SearchString.ToLower()) || x.LastName.ToLower().Contains(SearchString.ToLower())).ToList()) :
                           Problem("Entity set 'HealthCareContext.Customers'  is null.");

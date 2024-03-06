@@ -27,6 +27,7 @@ namespace HealthCare.MVC.Controllers
 
             if (SearchString != null)
             {
+                TempData["SearchString"] = SearchString;
                 return _agentService != null ?
                           View(_mapper.Map<List<AgentViewModel>>(_agentService.Get(x => x.FirstName.ToLower().Contains(SearchString.ToLower()) || x.LastName.ToLower().Contains(SearchString.ToLower())).ToList())) :
                           Problem("Entity set 'HealthCareContext.Agents'  is null.");

@@ -1,4 +1,4 @@
-﻿@model HealthCare.MVC.Models.NoteUpdateModel
+﻿@model HealthCare.MVC.Entities.Note
 
 @{
     ViewData["Title"] = "Edit";
@@ -33,6 +33,8 @@
                 <select asp-for="Type" class="form-control" asp-items="ViewBag.Type"></select>
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
+            <input asp-for="CreatedDate" class="form-control" hidden />
+            <input asp-for="UpdatedDate" class="form-control" hidden />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -41,9 +43,11 @@
 </div>
 
 <div>
-    <a asp-action="Index" asp-route-asignId="@TempData["AsignId"]">Back to List</a>
+    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

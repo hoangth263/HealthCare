@@ -2,6 +2,7 @@
 using HealthCare.MVC.Entities;
 using HealthCare.MVC.Models;
 using HealthCare.MVC.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace HealthCare.MVC.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class AgentsController : Controller
     {
         private readonly IAgentService _agentService;
@@ -57,6 +58,7 @@ namespace HealthCare.MVC.Controllers
             return View(agent);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Agents/Create
         public IActionResult Create()
         {
@@ -64,6 +66,7 @@ namespace HealthCare.MVC.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         // POST: Agents/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -108,6 +111,7 @@ namespace HealthCare.MVC.Controllers
             return View(agent);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Agents/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
@@ -126,6 +130,7 @@ namespace HealthCare.MVC.Controllers
             return View(_mapper.Map<AgentUpdateModel>(agent));
         }
 
+        [Authorize(Roles = "Admin")]
         // POST: Agents/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -206,6 +211,7 @@ namespace HealthCare.MVC.Controllers
             return View(agent);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Agents/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
@@ -224,6 +230,7 @@ namespace HealthCare.MVC.Controllers
             return View(agent);
         }
 
+        [Authorize(Roles = "Admin")]
         // POST: Agents/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

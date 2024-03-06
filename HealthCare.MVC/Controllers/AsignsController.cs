@@ -2,6 +2,7 @@
 using HealthCare.MVC.Entities;
 using HealthCare.MVC.Models;
 using HealthCare.MVC.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +10,7 @@ using System.Security.Claims;
 
 namespace HealthCare.MVC.Controllers
 {
-
-    //[Authorize]
+    [Authorize(Roles = "Admin")]
     public class AsignsController : Controller
     {
         private readonly IAsignService _asignService;
@@ -61,7 +61,6 @@ namespace HealthCare.MVC.Controllers
 
             return View(asign);
         }
-
         // GET: Asigns/Create
         public IActionResult Create(int id)
         {

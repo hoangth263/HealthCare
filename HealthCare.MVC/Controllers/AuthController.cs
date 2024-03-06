@@ -27,8 +27,6 @@ public class AuthController : Controller
     public IActionResult Logout()
     {
         HttpContext.SignOutAsync("MyCookieAuth");
-        // Clear all session data
-        HttpContext.Session.Clear();
         return RedirectToAction("Login", "Auth");
     }
 

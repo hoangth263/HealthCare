@@ -13,11 +13,8 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-           @*  <div class="form-group">
-                <label asp-for="AsignId" class="control-label"></label>
-                <input asp-for="AsignId" class="form-control" value="@TempData["AsignId"]" readonly />
-                <span asp-validation-for="AsignId" class="text-danger"></span>
-            </div> *@
+            <input asp-for="AgentId" class="form-control" hidden />
+            <input asp-for="CustomerId" class="form-control" hidden />
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />

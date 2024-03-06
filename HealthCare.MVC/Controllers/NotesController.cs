@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace HealthCare.MVC.Controllers
 {
@@ -88,10 +89,11 @@ namespace HealthCare.MVC.Controllers
         }
 
         // GET: Notes/Create
-        public IActionResult Create(int asignId)
+        public IActionResult Create(int customerId)
         {
             ViewData["Type"] = new SelectList(TypeList());
-            TempData["CustomerId"] = asignId;
+            TempData["AgentId"] = ((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.Sid).Value;
+            TempData["CustomerId"] = customerId;
             return View();
         }
 
@@ -100,18 +102,18 @@ namespace HealthCare.MVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CustomerId,Title,Content,Type")] NoteCreateModel note)
+        public async Task<IActionResult> Create([Bind("AgentId,CustomerId,Title,Content,Type")] NoteCreateModel note)
         {
             if (ModelState.IsValid)
             {
                 await _noteService.AddAsync(_mapper.Map<Note>(note));
                 await _noteService.SaveChangeAsync();
-                return RedirectToAction(nameof(Index), new { asignId = note.CustomerId });
+                return RedirectToAction("Details", "Customers", new { id = note.CustomerId });
 
             }
             ViewData["Type"] = new SelectList(TypeList(), note.Type);
             TempData["CustomerId"] = note.CustomerId;
-            return View(note);
+            return RedirectToAction("Details", "Customers", new { id = note.CustomerId });
         }
 
         // GET: Notes/Edit/5
@@ -141,7 +143,7 @@ namespace HealthCare.MVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CustomerId,Title,Content,Type,CreatedDate,UpdatedDate")] NoteUpdateModel note)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AgentId,CustomerId,Title,Content,Type,CreatedDate,UpdatedDate")] NoteUpdateModel note)
         {
             if (id != note.Id)
             {
@@ -167,7 +169,7 @@ namespace HealthCare.MVC.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index), new { asignId = note.CustomerId });
+                return RedirectToAction("Details", "Customers", new { id = note.CustomerId });
             }
             ViewData["Type"] = new SelectList(TypeList(), note.Type);
             TempData["CustomerId"] = note.CustomerId;
@@ -202,10 +204,14 @@ namespace HealthCare.MVC.Controllers
             {
                 return Problem("Entity set 'HealthCareContext.Notes'  is null.");
             }
-            var asignId = _noteService.Get(x => x.Id == id).FirstOrDefault().CustomerId;
-            await _noteService.Remove(id);
+            //var asignId = _noteService.Get(x => x.Id == id).FirstOrDefault().CustomerId;
+            //await _noteService.Remove(id);
+            var note = await _noteService.FindAsync(id);
+            note.IsDeleted = true;
+            note.UpdatedDate = DateTime.Now;
+            _noteService.Update(note);
             await _noteService.SaveChangeAsync();
-            return RedirectToAction(nameof(Index), new { asignId = asignId });
+            return RedirectToAction("Details", "Customers", new { id = note.CustomerId });
         }
 
         private bool NoteExists(int id)

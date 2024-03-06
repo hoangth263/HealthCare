@@ -5,6 +5,7 @@ using HealthCare.MVC.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 
 namespace HealthCare.MVC.Controllers
@@ -55,13 +56,18 @@ namespace HealthCare.MVC.Controllers
 
             var asignList = _asignService.Get(x => x.CustomerId == id).Include(x => x.Agent).ToList();
             customerVM.Agents = new List<string>();
+            int check = 0;
             foreach (var asign in asignList)
             {
                 customerVM.Agents.Add(asign.Agent.FirstName + " " + asign.Agent.LastName);
+                if (asign.AgentId == int.Parse(((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.Sid).Value))
+                {
+                    check = asign.AgentId;
+                }
             }
 
 
-            var notesVM = _mapper.Map<List<NoteViewModel>>(_noteService.Get(x => x.CustomerId == id).OrderBy(x => x.UpdatedDate).ToList());
+            var notesVM = _mapper.Map<List<NoteViewModel>>(_noteService.Get(x => x.CustomerId == id && x.IsDeleted == false).OrderBy(x => x.UpdatedDate).ToList());
 
             foreach (var note in notesVM)
             {
@@ -73,11 +79,12 @@ namespace HealthCare.MVC.Controllers
             {
                 return NotFound();
             }
-
+            TempData["AgentId"] = check;
             return View(customerVM);
         }
 
         // GET: Customers/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -86,6 +93,7 @@ namespace HealthCare.MVC.Controllers
         // POST: Customers/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Email,FirstName,LastName,PhoneNumber,Address")] CustomerCreateModel customer)
@@ -124,6 +132,7 @@ namespace HealthCare.MVC.Controllers
         }
 
         // GET: Customers/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             if (id == null || _customerService == null || id == 0)
@@ -132,7 +141,7 @@ namespace HealthCare.MVC.Controllers
             }
 
             var customer = await _customerService.FindAsync(id);
-            if (customer == null)
+            if (customer == null || customer.IsDeleted == true )
             {
                 return NotFound();
             }
@@ -142,6 +151,7 @@ namespace HealthCare.MVC.Controllers
         // POST: Customers/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,PhoneNumber,Address")] Customer customer)
@@ -205,6 +215,7 @@ namespace HealthCare.MVC.Controllers
         }
 
         // GET: Customers/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id == null || _customerService == null)
@@ -213,7 +224,7 @@ namespace HealthCare.MVC.Controllers
             }
 
             var customer = await _customerService.FindAsync(id);
-            if (customer == null)
+            if (customer == null || customer.IsDeleted == true)
             {
                 return NotFound();
             }
@@ -222,6 +233,7 @@ namespace HealthCare.MVC.Controllers
         }
 
         // POST: Customers/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -230,8 +242,9 @@ namespace HealthCare.MVC.Controllers
             {
                 return Problem("Entity set 'HealthCareContext.Customers'  is null.");
             }
-
-            await _customerService.Remove(id);
+            var customer = await _customerService.FindAsync(id);
+            customer.IsDeleted = true;
+            _customerService.Update(customer);
             await _customerService.SaveChangeAsync();
             return RedirectToAction(nameof(Index));
         }

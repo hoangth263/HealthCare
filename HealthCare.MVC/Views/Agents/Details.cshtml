@@ -65,7 +65,7 @@
                 @if (User.IsInRole("Admin"))
                 {
                     <td class="text-center">
-                        <a asp-action="Details" asp-controller="Customers" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                        <a asp-action="Details" asp-controller="Customers" asp-route-id="@item.Customer.Id" class="btn btn-info btn-sm">Details</a>
                         <a asp-action="Edit" asp-controller="Asigns" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
                         <a asp-action="Delete" asp-controller="Asigns" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Delete</a>
                     </td>
@@ -73,7 +73,7 @@
                 else
                 {
                     <td class="text-center">
-                        <a asp-action="Details" asp-controller="Customers" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                        <a asp-action="Details" asp-controller="Customers" asp-route-id="@item.Customer.Id" class="btn btn-info btn-sm">Details</a>
                     </td>
                 }
             </tr>

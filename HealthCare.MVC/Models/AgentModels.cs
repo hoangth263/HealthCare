@@ -11,7 +11,7 @@ namespace HealthCare.MVC.Models
         public string PhoneNumber { get; set; } = null!;
         public string Address { get; set; } = null!;
         public string Role { get; set; } = null!;
-        public virtual ICollection<Asign> Asigns { get; set; }
+        public virtual IList<Asign> Asigns { get; set; }
     }
 
     public class AgentDetailsModel : AgentViewModel

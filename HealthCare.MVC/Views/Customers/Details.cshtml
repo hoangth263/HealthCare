@@ -4,10 +4,9 @@
     ViewData["Title"] = "Details";
 }
 <div class="container py-5">
-    <h1 class="text-center mb-5">Details</h1>
     <div class="card shadow-lg">
         <div class="card-body">
-            <h4 class="card-title text-center mb-4">Customer</h4>
+            <h1 class="card-title text-center mb-4" style="font-weight: bold;">Customer Details</h1>
             <hr />
             <dl class="row">
                 <dt class="col-sm-3 text-end">Email:</dt>
@@ -41,6 +40,159 @@
                     }
                 </dd>
 
+                @if (Model.Country != null)
+                {
+                    <dt class="col-sm-3 text-end">Country:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Country)</dd>
+                }
+
+                @if (Model.City != null)
+                {
+                    <dt class="col-sm-3 text-end">City:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.City)</dd>
+                }
+
+                @if (Model.CompanyName != null)
+                {
+                    <dt class="col-sm-3 text-end">CompanyName:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.CompanyName)</dd>
+                }
+
+                @if (Model.Region != null)
+                {
+                    <dt class="col-sm-3 text-end">Region:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Region)</dd>
+                }
+
+                @if (Model.PostalCode != null)
+                {
+                    <dt class="col-sm-3 text-end">PostalCode:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.PostalCode)</dd>
+                }
+
+                @if (Model.State != null)
+                {
+                    <dt class="col-sm-3 text-end">State:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.State)</dd>
+                }
+
+                @if (Model.County != null)
+                {
+                    <dt class="col-sm-3 text-end">County:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.County)</dd>
+                }
+
+                @if (Model.HomePhone != null)
+                {
+                    <dt class="col-sm-3 text-end">HomePhone:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.HomePhone)</dd>
+                }
+
+                @if (Model.HomePage != null)
+                {
+                    <dt class="col-sm-3 text-end">HomePage:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.HomePage)</dd>
+                }
+
+                @if (Model.Longitude != null)
+                {
+                    <dt class="col-sm-3 text-end">Longitude:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Longitude)</dd>
+                }
+
+                @if (Model.Latitude != null)
+                {
+                    <dt class="col-sm-3 text-end">Latitude:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Latitude)</dd>
+                }
+
+                @if (Model.JobTitle != null)
+                {
+                    <dt class="col-sm-3 text-end">JobTitle:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.JobTitle)</dd>
+                }
+
+                @if (Model.ContactGender != null)
+                {
+                    <dt class="col-sm-3 text-end">ContactGender:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.ContactGender)</dd>
+                }
+
+                @if (Model.EmployeeSize != null)
+                {
+                    <dt class="col-sm-3 text-end">EmployeeSize:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.EmployeeSize)</dd>
+                }
+
+                @if (Model.CapitalSize != null)
+                {
+                    <dt class="col-sm-3 text-end">CapitalSize:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.CapitalSize)</dd>
+                }
+
+                @if (Model.ClassifyCode != null)
+                {
+                    <dt class="col-sm-3 text-end">ClassifyCode:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.ClassifyCode)</dd>
+                }
+
+                @if (Model.BusinessType != null)
+                {
+                    <dt class="col-sm-3 text-end">BusinessType:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.BusinessType)</dd>
+                }
+
+                @if (Model.Nationality != null)
+                {
+                    <dt class="col-sm-3 text-end">Nationality:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Nationality)</dd>
+                }
+
+                @if (Model.IsMarried != null)
+                {
+                    <dt class="col-sm-3 text-end">IsMarried:</dt>
+                    <dd class="col-sm-9">
+                        @((Model.IsMarried.HasValue ? (Model.IsMarried.Value ? "Yes" : "No") : "Unknown"))
+                    </dd>
+                }
+
+                @if (Model.HaveChildren != null)
+                {
+                    <dt class="col-sm-3 text-end">HaveChildren:</dt>
+                    <dd class="col-sm-9">
+                        @((Model.HaveChildren.HasValue ? (Model.HaveChildren.Value ? "Yes" : "No") : "Unknown"))
+                    </dd>
+                }
+
+                @if (Model.HomeOwner != null)
+                {
+                    <dt class="col-sm-3 text-end">HomeOwner:</dt>
+                    <dd class="col-sm-9">
+                        @((Model.HomeOwner.HasValue ? (Model.HomeOwner.Value ? "Yes" : "No") : "Unknown"))
+                    </dd>
+                }
+
+                @if (Model.YearInBusiness != null)
+                {
+                    <dt class="col-sm-3 text-end">YearInBusiness:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.YearInBusiness)</dd>
+                }
+
+                @if (Model.IsSelfEmployed != null)
+                {
+                    <dt class="col-sm-3 text-end">IsSelfEmployed:</dt>
+                    <dd class="col-sm-9">
+                        @((Model.IsSelfEmployed.HasValue ? (Model.IsSelfEmployed.Value ? "Yes" : "No") : "Unknown"))
+                    </dd>
+                }
+
+                @if (Model.DynamicInfo != null)
+                {
+                    <dt class="col-sm-3 text-end">DynamicInfo:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.DynamicInfo)</dd>
+                }
+
+
                 <dt class="col-sm-3 text-end">Created Date:</dt>
                 <dd class="col-sm-9">@Html.DisplayFor(model => model.CreatedDate)</dd>
 
@@ -49,20 +201,20 @@
             </dl>
         </div>
     </div>
-    <div class="mt-5 d-flex justify-content-between">
-        @if (TempData["AsignId"].ToString().Equals("true"))
+    <div class="mt-5 d-flex">
+        @if (User.IsInRole("Admin"))
         {
             <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
         }
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List </a>
     </div>
 </div>
 
 <br />
 
-<h3 style="text-align: center;">Agent Notes</h3>
+<h3 style="text-align: center; font-weight: bold;">Agent Notes</h3>
 
-@if (TempData["AsignId"].ToString().Equals("true"))
+@if (User.IsInRole("Admin"))
 {
     <a asp-action="Create" asp-controller="Notes" asp-route-customerId="@Model.Id" class="btn btn-primary btn-sm">Add Note</a>
 }
@@ -70,7 +222,7 @@
     <thead class="thead-dark">
         <tr class="text-center">
             <th>
-                AgentEmail
+                Agent Name
             </th>
             <th>
                 Title
@@ -87,7 +239,7 @@
             <th>
                 UpdatedDate
             </th>
-            @if (TempData["AsignId"].ToString().Equals("true"))
+            @if (!TempData["AgentId"].ToString().Equals("0"))
             {
                 <th>Actions</th>
             }
@@ -115,11 +267,14 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.UpdatedDate)
                 </td>
-                @if (!TempData["AsignId"].ToString().Equals("0") && TempData["AsignId"].ToString().Equals(item.Agent.Id.ToString()))
+                @if (!TempData["AgentId"].ToString().Equals("0"))
                 {
                     <td>
+                        @if (TempData["AgentId"].ToString().Equals(item.Agent.Id.ToString()))
+                        {
                         <a asp-action="Edit" asp-controller="Notes" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
                         <a asp-action="Delete" asp-controller="Notes" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Delete</a>
+                        }
                     </td>
 
                 }

@@ -31,7 +31,7 @@ namespace HealthCare.MVC.Controllers
         // GET: Customers
         public async Task<IActionResult> Index(string? SearchString)
         {
-
+            TempData["Active"] = "Customers";
             if (SearchString != null)
             {
                 TempData["SearchString"] = SearchString;
@@ -67,7 +67,7 @@ namespace HealthCare.MVC.Controllers
             }
 
 
-            var notesVM = _mapper.Map<List<NoteViewModel>>(_noteService.Get(x => x.CustomerId == id && x.IsDeleted == false).OrderBy(x => x.UpdatedDate).ToList());
+            var notesVM = _mapper.Map<List<NoteViewModel>>(_noteService.Get(x => x.CustomerId == id && x.IsDeleted == false).OrderByDescending(x => x.UpdatedDate).ToList());
 
             foreach (var note in notesVM)
             {
@@ -80,6 +80,7 @@ namespace HealthCare.MVC.Controllers
                 return NotFound();
             }
             TempData["AgentId"] = check;
+            TempData["Active"] = "Customers";
             return View(customerVM);
         }
 
@@ -87,6 +88,7 @@ namespace HealthCare.MVC.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
+            TempData["Active"] = "Customers";
             return View();
         }
 
@@ -96,7 +98,9 @@ namespace HealthCare.MVC.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Email,FirstName,LastName,PhoneNumber,Address")] CustomerCreateModel customer)
+        public async Task<IActionResult> Create([Bind("Email,FirstName,LastName,PhoneNumber,AddressCountry,City,CompanyName,Region," +
+            "PostalCode State,County,HomePhone,HomePage,Longitude,Latitude,JobTitle,ContactGender,EmployeeSize,CapitalSize,ClassifyCode," +
+            "BusinessType,Nationality,IsMarried,HaveChildren,HomeOwner,YearInBusiness,IsSelfEmployed,DynamicInfo")] CustomerCreateModel customer)
         {
             if (!IsValidPhoneNumber(customer.PhoneNumber))
             {
@@ -120,6 +124,7 @@ namespace HealthCare.MVC.Controllers
             }
             if (ModelState.ErrorCount > 0)
             {
+                TempData["Active"] = "Customers";
                 return View(customer);
             }
             if (ModelState.IsValid)
@@ -128,6 +133,7 @@ namespace HealthCare.MVC.Controllers
                 await _customerService.SaveChangeAsync();
                 return RedirectToAction(nameof(Index));
             }
+            TempData["Active"] = "Customers";
             return View(customer);
         }
 
@@ -141,11 +147,12 @@ namespace HealthCare.MVC.Controllers
             }
 
             var customer = await _customerService.FindAsync(id);
-            if (customer == null || customer.IsDeleted == true )
+            if (customer == null || customer.IsDeleted == true)
             {
                 return NotFound();
             }
-            return View(customer);
+            TempData["Active"] = "Customers";
+            return View(_mapper.Map<CustomerUpdateModel>(customer));
         }
 
         // POST: Customers/Edit/5
@@ -154,7 +161,9 @@ namespace HealthCare.MVC.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,PhoneNumber,Address")] Customer customer)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,FirstName,LastName,PhoneNumber,Address,Country,City,CompanyName,Region," +
+            "PostalCode State,County,HomePhone,HomePage,Longitude,Latitude,JobTitle,ContactGender,EmployeeSize,CapitalSize,ClassifyCode," +
+            "BusinessType,Nationality,IsMarried,HaveChildren,HomeOwner,YearInBusiness,IsSelfEmployed,DynamicInfo")] CustomerUpdateModel customer)
         {
             if (id != customer.Id)
             {
@@ -193,10 +202,51 @@ namespace HealthCare.MVC.Controllers
                     }
                     if (ModelState.ErrorCount > 0)
                     {
+                        TempData["Active"] = "Customers";
                         return View(customer);
                     }
-                    _customerService.Update(_mapper.Map<Customer>(customer));
+
+                    var customerEntity = _customerService.Get(x => x.Id == customer.Id).FirstOrDefault();
+                    if (customerEntity == null)
+                    {
+                        return NotFound();
+                    }
+                    customerEntity.Email = customer.Email;
+                    customerEntity.FirstName = customer.FirstName;
+                    customerEntity.LastName = customer.LastName;
+                    customerEntity.PhoneNumber = customer.PhoneNumber;
+                    customerEntity.Address = customer.Address;
+
+                    customerEntity.Country = customer.Country;
+                    customerEntity.City = customer.City;
+                    customerEntity.CompanyName = customer.CompanyName;
+                    customerEntity.Region = customer.Region;
+                    customerEntity.PostalCode = customer.PostalCode;
+                    customerEntity.State = customer.State;
+                    customerEntity.County = customer.County;
+                    customerEntity.HomePhone = customer.HomePhone;
+                    customerEntity.HomePage = customer.HomePage;
+                    customerEntity.Longitude = customer.Longitude;
+                    customerEntity.Latitude = customer.Latitude;
+                    customerEntity.JobTitle = customer.JobTitle;
+                    customerEntity.ContactGender = customer.ContactGender;
+                    customerEntity.EmployeeSize = customer.EmployeeSize;
+                    customerEntity.CapitalSize = customer.CapitalSize;
+                    customerEntity.ClassifyCode = customer.ClassifyCode;
+                    customerEntity.BusinessType = customer.BusinessType;
+                    customerEntity.Nationality = customer.Nationality;
+                    customerEntity.IsMarried = customer.IsMarried;
+                    customerEntity.HaveChildren = customer.HaveChildren;
+                    customerEntity.HomeOwner = customer.HomeOwner;
+                    customerEntity.YearInBusiness = customer.YearInBusiness;
+                    customerEntity.IsSelfEmployed = customer.IsSelfEmployed;
+                    customerEntity.DynamicInfo = customer.DynamicInfo;
+
+                    customerEntity.UpdatedDate = DateTime.Now;
+
+                    _customerService.Update(customerEntity);
                     await _customerService.SaveChangeAsync();
+                return RedirectToAction(nameof(Details), new { id = customerEntity.Id});
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -209,8 +259,8 @@ namespace HealthCare.MVC.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
+            TempData["Active"] = "Customers";
             return View(customer);
         }
 
@@ -228,7 +278,7 @@ namespace HealthCare.MVC.Controllers
             {
                 return NotFound();
             }
-
+            TempData["Active"] = "Customers";
             return View(customer);
         }
 
@@ -260,6 +310,7 @@ namespace HealthCare.MVC.Controllers
             string pattern = @"^(\([0-9]{3}\)|[0-9]{3}-)[0-9]{3}-[0-9]{4}$";
             return Regex.IsMatch(phoneNumber, pattern);
         }
+
         static bool IsValidEmail(string email)
         {
             // Regular expression pattern for validating email format

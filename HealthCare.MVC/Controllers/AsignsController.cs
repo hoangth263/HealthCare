@@ -64,6 +64,7 @@ namespace HealthCare.MVC.Controllers
         // GET: Asigns/Create
         public IActionResult Create(int id)
         {
+            TempData["Active"] = "Agents";
             TempData["AgentId"] = id;
             ViewData["CustomerId"] = new SelectList(_customerService.GetAll(), "Id", "Email");
             return View();
@@ -78,10 +79,22 @@ namespace HealthCare.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (_asignService.Get(x => x.AgentId == asign.AgentId && x.CustomerId == asign.CustomerId).Any())
+                var checkList = _asignService.Get(x => x.AgentId == asign.AgentId && x.CustomerId == asign.CustomerId); 
+                if (checkList.Any())
                 {
-                    ModelState.AddModelError("AgentId", "This customer is already assigned to this agent.");
-                    ModelState.AddModelError("CustomerId", "This customer is already assigned to this agent.");
+                    if (checkList.Where(x => x.IsDeleted == true).Any())
+                    {
+                        var asignUpdate = checkList.Where(x => x.IsDeleted == true).FirstOrDefault();
+                        asignUpdate.IsDeleted = false;
+                        asignUpdate.UpdatedDate = DateTime.Now;
+                        _asignService.Update(asignUpdate);
+                        await _asignService.SaveChangeAsync();
+                        return RedirectToAction("Details", "Agents", new { id = asign.AgentId });
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("CustomerId", "This customer is already assigned to this agent.");
+                    }
                 }
                 else
                 {
@@ -90,7 +103,8 @@ namespace HealthCare.MVC.Controllers
                     return RedirectToAction("Details", "Agents", new { id = asign.AgentId });
                 }
             }
-            ViewData["AgentId"] = new SelectList(_agentService.GetAll(), "Id", "Email", asign.AgentId);
+            TempData["Active"] = "Agents";
+            TempData["AgentId"] = asign.AgentId;
             ViewData["CustomerId"] = new SelectList(_customerService.GetAll(), "Id", "Email", asign.CustomerId);
             return View(asign);
         }
@@ -108,6 +122,7 @@ namespace HealthCare.MVC.Controllers
             {
                 return NotFound();
             }
+            TempData["Active"] = "Agents";
             TempData["AgentId"] = asign.AgentId;
             ViewData["CustomerId"] = new SelectList(_customerService.GetAll(), "Id", "Email", asign.CustomerId);
             return View(_mapper.Map<AsignUpdateModel>(asign));
@@ -161,6 +176,7 @@ namespace HealthCare.MVC.Controllers
                     }
                 }
             }
+            TempData["Active"] = "Agents";
             TempData["AgentId"] = asign.AgentId;
             ViewData["CustomerId"] = new SelectList(_customerService.GetAll(), "Id", "Email", asign.CustomerId);
             return View(asign);
@@ -183,6 +199,7 @@ namespace HealthCare.MVC.Controllers
                 return NotFound();
             }
 
+            TempData["Active"] = "Agents";
             return View(asign);
         }
 

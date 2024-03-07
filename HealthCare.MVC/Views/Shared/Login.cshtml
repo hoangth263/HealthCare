@@ -2,8 +2,9 @@
 
 @{
     ViewData["Title"] = "Login";
+    Layout = null;
 }
-
+@* 
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -78,3 +79,41 @@
         </div>
     </form>
 </div>
+ *@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Health Care - Login</title>
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+</head>
+
+<body>
+    <div class="main">
+        <h1>Health Care</h1>
+        <h3>Enter your login credentials</h3>
+        <form asp-controller="Auth" asp-action="Login" method="post" role="form">
+            <label for="first" asp-for="Email">Email</label>
+            <input type="text" id="first" placeholder="Enter your Email" asp-for="Email" class="form-control" required>
+
+            <label asp-for="Password">Password</label>
+            <input type="password" id="password" asp-for="Password" type="password" class="form-control" placeholder="Enter your Password" required>
+
+            <div class="wrap">
+                <button type="submit"
+                        onclick="solve()">
+                    Login
+                </button>
+            </div>
+        </form>
+        @* <p>
+            Not registered?
+            <a href="#"
+               style="text-decoration: none;">
+                Create an account
+            </a>
+        </p> *@
+    </div>
+</body>
+
+</html>

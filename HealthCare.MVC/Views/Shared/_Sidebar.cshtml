@@ -1,0 +1,35 @@
+﻿<div class="l-navbar" id="nav-bar">
+    <nav class="nav">
+        <div>
+            <a asp-controller="Home" asp-action="Index" class="nav_logo">
+                <i class='bx bx-layer nav_logo-icon'></i>
+                <span class="nav_logo-name">HealthCare</span>
+            </a>
+            <div class="nav_list" id="nav_list">
+                <a asp-controller="Home" asp-action="Index" class="nav_link @(TempData["Active"].Equals("Home") ? "active" : "")" onclick="colorLink(event)">
+                    <i class='bx bx-home nav_icon'></i>
+                    <span class="nav_name">Home</span>
+                </a>
+                <a asp-controller="Agents" asp-action="Index" class="nav_link @(TempData["Active"].Equals("Agents") ? "active" : "")" onclick="colorLink(event)">
+                    <i class='bx bx-user nav_icon'></i>
+                    <span class="nav_name">Agents</span>
+                </a>
+                <a asp-controller="Customers" asp-action="Index" class="nav_link @(TempData["Active"].Equals("Customers") ? "active" : "")" onclick="colorLink(event)">
+                    <i class='bx bxs-user-account nav_icon'></i>
+                    <span class="nav_name">Customers</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    <script>
+        /*===== LINK ACTIVE =====*/
+        // const linkColor = document.querySelectorAll('.nav_link')
+
+        // function colorLink(event) {
+        //     if (linkColor) {
+        //         linkColor.forEach(l => l.classList.remove('active'))
+        //         event.target.classList.add('active')
+        //     }
+        // }
+    </script>
+</div>

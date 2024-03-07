@@ -25,7 +25,7 @@ namespace HealthCare.MVC.Controllers
         // GET: Agents
         public async Task<IActionResult> Index(string? SearchString)
         {
-
+            TempData["Active"] = "Agents";
             if (SearchString != null)
             {
                 TempData["SearchString"] = SearchString;
@@ -54,7 +54,8 @@ namespace HealthCare.MVC.Controllers
             {
                 return NotFound();
             }
-
+            agent.Asigns = agent.Asigns.Where(x=>x.IsDeleted==false).OrderByDescending(x => x.UpdatedDate).ToList();
+            TempData["Active"] = "Agents";
             return View(agent);
         }
 
@@ -63,6 +64,7 @@ namespace HealthCare.MVC.Controllers
         public IActionResult Create()
         {
             ViewData["Role"] = new SelectList(new List<string> { "User", "Admin" });
+            TempData["Active"] = "Agents";
             return View();
         }
 
@@ -108,6 +110,7 @@ namespace HealthCare.MVC.Controllers
                 }
             }
             ViewData["Role"] = new SelectList(new List<string> { "User", "Admin" });
+            TempData["Active"] = "Agents";
             return View(agent);
         }
 
@@ -127,6 +130,7 @@ namespace HealthCare.MVC.Controllers
                 return NotFound();
             }
             ViewData["Role"] = new SelectList(new List<string> { "User", "Admin" }, agent.Role);
+            TempData["Active"] = "Agents";
             return View(_mapper.Map<AgentUpdateModel>(agent));
         }
 
@@ -208,6 +212,7 @@ namespace HealthCare.MVC.Controllers
                 }
             }
             ViewData["Role"] = new SelectList(new List<string> { "User", "Admin" }, agent.Role);
+            TempData["Active"] = "Agents";
             return View(agent);
         }
 
@@ -225,8 +230,7 @@ namespace HealthCare.MVC.Controllers
             {
                 return NotFound();
             }
-
-
+            TempData["Active"] = "Agents";
             return View(agent);
         }
 
@@ -240,13 +244,19 @@ namespace HealthCare.MVC.Controllers
             {
                 return Problem("Entity set 'HealthCareContext.Agents'  is null.");
             }
-            var agent = await _agentService.FindAsync(id);
-            agent.IsDeleted = true;
-            agent.UpdatedDate = DateTime.Now;
-            _agentService.Update(agent);
-
-            await _agentService.SaveChangeAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var agent = await _agentService.FindAsync(id);
+                agent.IsDeleted = true;
+                agent.UpdatedDate = DateTime.Now;
+                _agentService.Update(agent);
+                await _agentService.SaveChangeAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return Problem("Error while deleting agent.");
+            }
         }
 
         private bool AgentExists(int id)

@@ -15,6 +15,11 @@ namespace HealthCare.MVC.Controllers
 
         public IActionResult Index()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+            TempData["Active"] = "Home";
             return View();
         }
 

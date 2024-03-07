@@ -14,8 +14,8 @@
         public string PhoneNumber { get; set; } = null!;
         public string Address { get; set; } = null!;
         public string Password { get; set; } = null!;
-        public DateTime? CreatedDate { get; set; }
-        public DateTime? UpdatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
         public bool IsDeleted { get; set; }
         public string Role { get; set; } = null!;
 

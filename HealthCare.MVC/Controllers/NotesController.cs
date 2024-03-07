@@ -73,6 +73,7 @@ namespace HealthCare.MVC.Controllers
             }
 
             TempData["CustomerId"] = note.CustomerId;
+            TempData["Active"] = "Agents";
             return View(note);
         }
 
@@ -92,6 +93,7 @@ namespace HealthCare.MVC.Controllers
         public IActionResult Create(int customerId)
         {
             ViewData["Type"] = new SelectList(TypeList());
+            TempData["Active"] = "Agents";
             TempData["AgentId"] = ((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.Sid).Value;
             TempData["CustomerId"] = customerId;
             return View();
@@ -112,8 +114,9 @@ namespace HealthCare.MVC.Controllers
 
             }
             ViewData["Type"] = new SelectList(TypeList(), note.Type);
+            TempData["Active"] = "Agents";
             TempData["CustomerId"] = note.CustomerId;
-            return RedirectToAction("Details", "Customers", new { id = note.CustomerId });
+            return View(note);
         }
 
         // GET: Notes/Edit/5
@@ -134,6 +137,7 @@ namespace HealthCare.MVC.Controllers
                 return NotFound();
             }
             ViewData["Type"] = new SelectList(TypeList(), note.Type);
+            TempData["Active"] = "Agents";
             TempData["CustomerId"] = asignId;
             return View(note);
         }
@@ -173,6 +177,7 @@ namespace HealthCare.MVC.Controllers
             }
             ViewData["Type"] = new SelectList(TypeList(), note.Type);
             TempData["CustomerId"] = note.CustomerId;
+            TempData["Active"] = "Agents";
             return View(note);
         }
 
@@ -192,6 +197,7 @@ namespace HealthCare.MVC.Controllers
                 return NotFound();
             }
             TempData["CustomerId"] = note.CustomerId;
+            TempData["Active"] = "Agents";
             return View(note);
         }
 
